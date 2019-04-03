@@ -1,18 +1,19 @@
 package com.example.taylor.hardwarespecs;
 
-import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+        import android.os.Build;
+        import android.os.Bundle;
+        import android.support.annotation.NonNull;
+        import android.support.annotation.Nullable;
+        import android.support.v4.app.Fragment;
+        import android.support.v7.widget.DividerItemDecoration;
+        import android.support.v7.widget.LinearLayoutManager;
+        import android.support.v7.widget.RecyclerView;
+        import android.util.Log;
+        import android.view.LayoutInflater;
+        import android.view.View;
+        import android.view.ViewGroup;
 
-import java.util.ArrayList;
+        import java.util.ArrayList;
 
 public class CPUSpecs extends Fragment {
     private  static  final  String TAG = "SystemSpecsFragment";
@@ -54,7 +55,11 @@ public class CPUSpecs extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(this.getContext(), mInfoObject);
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
 }
