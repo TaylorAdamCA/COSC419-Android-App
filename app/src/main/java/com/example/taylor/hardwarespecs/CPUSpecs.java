@@ -11,7 +11,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class CPUSpecs extends Fragment {
@@ -30,8 +33,8 @@ public class CPUSpecs extends Fragment {
     private void initInfoObjects(View view) {
         mInfoObject = new ArrayList<>();
         mInfoObject.add(new InfoObject(
-                "Test",
-                "Test"
+                "Name",
+                getCpuSpecs()
         ));
         mInfoObject.add(new InfoObject(
                 "Test1",
@@ -48,6 +51,37 @@ public class CPUSpecs extends Fragment {
 
 
         initRecyclerView(view);
+    }
+    private String getCpuSpecs(){
+        ProcessBuilder processBuilder;
+        String Holder = "";
+        String[] DATA = {"/system/bin/cat", "/proc/cpuinfo"};
+        InputStream inputStream;
+        Process process ;
+        byte[] byteArry ;
+
+        byteArry = new byte[1024];
+
+        try{
+            processBuilder = new ProcessBuilder(DATA);
+
+            process = processBuilder.start();
+
+            inputStream = process.getInputStream();
+
+            while(inputStream.read(byteArry) != -1){
+
+                Holder = Holder + new String(byteArry);
+            }
+
+            inputStream.close();
+
+        } catch(IOException ex){
+
+            ex.printStackTrace();
+        }
+
+       return Holder;
     }
     private void initRecyclerView(View view) {
         Log.d(TAG, "initRecyclerView: ");
