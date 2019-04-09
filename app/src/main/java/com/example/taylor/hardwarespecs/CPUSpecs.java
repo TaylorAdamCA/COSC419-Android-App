@@ -1,33 +1,27 @@
 package com.example.taylor.hardwarespecs;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 
-        import android.app.ActivityManager;
-        import android.os.Build;
-        import android.os.Bundle;
-        import android.os.Debug;
-        import android.os.Handler;
-        import android.support.annotation.NonNull;
-        import android.support.annotation.Nullable;
-        import android.support.v4.app.Fragment;
-        import android.support.v7.widget.DividerItemDecoration;
-        import android.support.v7.widget.LinearLayoutManager;
-        import android.support.v7.widget.RecyclerView;
-        import android.util.Log;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.TextView;
 
-
-        import java.util.ArrayList;
-        import java.util.Timer;
-        import java.util.TimerTask;
-
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class CPUSpecs extends Fragment {
-    private  static  final  String TAG = "SystemSpecsFragment";
+    private static final String TAG = "SystemSpecsFragment";
     private ArrayList<InfoObject> mInfoObject;
     InfoUtil mInfoUtil = new InfoUtil();
     RecyclerViewAdapter adapter;
@@ -39,7 +33,7 @@ public class CPUSpecs extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.tab1_fragment, container, false);
+        View view = inflater.inflate(R.layout.tab1_fragment, container, false);
         numCpus = mInfoUtil.getNumCores();
         timerHandler = new Handler();
         initInfoObjects(view);
@@ -58,34 +52,35 @@ public class CPUSpecs extends Fragment {
                         //update textView
                         //ERROR:textView2 cannot be resolved
                         double[] ms = mInfoUtil.getMemorySize(view2);
-                      setInfoObject("Free Memory", String.format("%.2f",ms[1]/1048576) + " MB");
-                      setInfoObject("Available Memory", String.format("%.2f",(ms[0]/1048576) - ms[1]/1048576) + " MB");
-                      for(int i = 1; i <= numCpus; i++)
-                        setInfoObject("       Cpu"+i,Double.toString(mInfoUtil.getFrequency(i-1)/1000) + " MHz");
+                        setInfoObject("Free Memory", String.format("%.2f", ms[1] / 1048576) + " MB");
+                        setInfoObject("Available Memory", String.format("%.2f", (ms[0] / 1048576) - ms[1] / 1048576) + " MB");
+                        for (int i = 1; i <= numCpus; i++)
+                            setInfoObject("       Cpu" + i, Double.toString(mInfoUtil.getFrequency(i - 1) / 1000) + " MHz");
                     }
                 });
-            }};
+            }
+        };
     }
 
 
     private void initInfoObjects(View view) {
-       double[] ms = mInfoUtil.getMemorySize(view);
-       double[] clockSpeeds = mInfoUtil.getClockSpeeds(numCpus);
+        double[] ms = mInfoUtil.getMemorySize(view);
+        double[] clockSpeeds = mInfoUtil.getClockSpeeds(numCpus);
         mInfoObject = new ArrayList<>();
         mInfoObject.add(new InfoObject(
 
                 "Total Memory",
-                String.format("%.2f", ms[0]/1048576) + " MB"
+                String.format("%.2f", ms[0] / 1048576) + " MB"
 
         ));
         mInfoObject.add(new InfoObject(
                 "Free Memory",
-                String.format("%.2f", ms[1]/1048576) + " MB"
+                String.format("%.2f", ms[1] / 1048576) + " MB"
         ));
 
         mInfoObject.add(new InfoObject(
                 "Available Memory",
-                String.format("%.2f",(
+                String.format("%.2f", (
                         ms[0] - ms[1]
                 ))
         ));
@@ -95,12 +90,12 @@ public class CPUSpecs extends Fragment {
         ));
         mInfoObject.add(new InfoObject(
                 "Clock Speed Range",
-                Double.toString(clockSpeeds[0]/1000) + " MHz - " + String.format("%.2f", clockSpeeds[1]/1000.00)+ " GHz"
+                Double.toString(clockSpeeds[0] / 1000) + " MHz - " + String.format("%.2f", clockSpeeds[1] / 1000.00) + " GHz"
         ));
-        for(int i = 1; i <= numCpus; i++) {
+        for (int i = 1; i <= numCpus; i++) {
             mInfoObject.add(new InfoObject(
-                    "       Cpu"+i,
-                    Double.toString(mInfoUtil.getFrequency(i-1)/1000) + " MHz"
+                    "       Cpu" + i,
+                    Double.toString(mInfoUtil.getFrequency(i - 1) / 1000) + " MHz"
             ));
         }
 
@@ -118,16 +113,16 @@ public class CPUSpecs extends Fragment {
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
+
     private void setInfoObject(String name, String info) {
-        for (int i = 0; i < this.mInfoObject.size(); i++){
+        for (int i = 0; i < this.mInfoObject.size(); i++) {
             InfoObject io = mInfoObject.get(i);
             if (io.getName().equals(name)) {
                 io.setInfo(info);
                 adapter.notifyItemChanged(i);
 
             }
-    }
-
+        }
 
 
     }
