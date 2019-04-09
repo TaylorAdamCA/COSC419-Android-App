@@ -26,6 +26,8 @@ package com.example.taylor.hardwarespecs;
         import java.io.InputStreamReader;
         import java.io.RandomAccessFile;
         import java.util.ArrayList;
+        import java.util.Timer;
+        import java.util.TimerTask;
         import java.util.regex.Matcher;
         import java.util.regex.Pattern;
 
@@ -37,163 +39,69 @@ public class CPUSpecs extends Fragment {
     private static final Build build = new Build();
     private ArrayList<InfoObject> mInfoObject;
     TextView textView ;
-    ProcessBuilder processBuilder;
-    ActivityManager am;
-    String Holder = "";
-    String[] DATA = {"proc/cpuinfo","proc/meminfo"};
-    InputStream inputStream;
-    Process process ;
-    byte[] byteArry ;
+    InfoUtil mInfoUtil = new InfoUtil();
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.tab1_fragment, container, false);
-
-        textView = (TextView)view.findViewById(R.id.textView);
-       //textView.setText("");
-
-
-        byteArry = new byte[1024];
-
-        try{
-            processBuilder = new ProcessBuilder(DATA);
-
-            process = processBuilder.start();
-
-            inputStream = process.getInputStream();
-
-            while(inputStream.read(byteArry) != -1){
-                Log.d(TAG, "onCreateView: "+ new String(byteArry));
-                Holder = Holder + new String(byteArry);
-            }
-
-            inputStream.close();
-
-        } catch(IOException ex){
-
-            ex.printStackTrace();
-        }
-    Holder += "\n Free Memory" + getMemorySize().free + "\n Total Memory " + getMemorySize().total + " \n" + readFile();
-           textView.setText(Holder);
-
-      // initInfoObjects(view);
+        initInfoObjects(view);
         return view;
     }
-    /**
-     * Gets the number of cores available in this device, across all processors.
-     * Requires: Ability to peruse the filesystem at "/sys/devices/system/cpu"
-     * @return The number of cores, or 1 if failed to get result
-     */
-    private int getNumCores() {
-        //Private Class to display only CPU devices in the directory listing
-        class CpuFilter implements FileFilter {
-            @Override
-            public boolean accept(File pathname) {
-                //Check if filename is "cpu", followed by one or more digits
-                if(Pattern.matches("cpu[0-9]+", pathname.getName())) {
-                    return true;
-                }
-                return false;
-            }
-        }
 
-        try {
-            //Get directory containing CPU info
-            File dir = new File("/sys/devices/system/cpu/");
-            //Filter to only list the devices we care about
-            File[] files = dir.listFiles(new CpuFilter());
-            //Return the number of cores (virtual CPU devices)
-            return files.length;
-        } catch(Exception e) {
-            //Default to return 1 core
-            return 1;
-        }
-    }
-    private String readFile()
-    {
-        String myData = "";
-        File myExternalFile = new File("proc/cpuinfo");
-        try {
-            FileInputStream fis = new FileInputStream(myExternalFile);
-            DataInputStream in = new DataInputStream(fis);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-            String strLine;
-            Boolean read = false;
-                while ((strLine = br.readLine()) != null) {
-                    if(strLine.contains("Hardware")) read = true;
-                    if(read) {
-                        Log.d(TAG, "readFile: " + strLine.substring(strLine.indexOf(':')));
-                        myData = myData + strLine + "\n";
-                        read = false;
-                    }
-                    }
-            br.close();
-            in.close();
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return myData + "\n " + getNumCores();
-    }
 
-    /* Taken from https://stackoverflow.com/questions/3170691/how-to-get-current-memory-usage-in-android/3192348#3192348
-     * Returns the current memory usage and free memory in megabytes */
-    private MemorySize getMemorySize() {
-        final Pattern PATTERN = Pattern.compile("([a-zA-Z]+):\\s*(\\d+)");
+//    private String readFile()
+//    {
+//        String myData = "";
+//        File myExternalFile = new File("proc/cpuinfo");
+//        try {
+//            FileInputStream fis = new FileInputStream(myExternalFile);
+//            DataInputStream in = new DataInputStream(fis);
+//            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+//
+//            String strLine;
+//            Boolean read = false;
+//                while ((strLine = br.readLine()) != null) {
+//                    if(strLine.contains("Hardware")) read = true;
+//                    if(read) {
+//                        Log.d(TAG, "readFile: " + strLine.substring(strLine.indexOf(':')));
+//                        myData = myData + strLine + "\n";
+//                        read = false;
+//                    }
+//                    }
+//            br.close();
+//            in.close();
+//            fis.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return myData + "\n " + getNumCores();
+//    }
 
-        MemorySize result = new MemorySize();
-        String line;
-        try {
-            RandomAccessFile reader = new RandomAccessFile("/proc/meminfo", "r");
-            while ((line = reader.readLine()) != null) {
-                Matcher m = PATTERN.matcher(line);
-                if (m.find()) {
-                    String name = m.group(1);
-                    String size = m.group(2);
 
-                    if (name.equalsIgnoreCase("MemTotal")) {
-                        result.total = Long.parseLong(size);
-                    } else if (name.equalsIgnoreCase("MemFree") || name.equalsIgnoreCase("Buffers") ||
-                            name.equalsIgnoreCase("Cached") || name.equalsIgnoreCase("SwapFree")) {
-                        result.free += Long.parseLong(size);
-                    }
-                }
-            }
-            reader.close();
 
-            result.total *= 1024;
-            result.free *= 1024;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return result;
-    }
-
-    private static class MemorySize {
-        public long total = 0;
-        public long free = 0;
-    }
     private void initInfoObjects(View view) {
+       long[] ms = mInfoUtil.getMemorySize(view);
+
         mInfoObject = new ArrayList<>();
         mInfoObject.add(new InfoObject(
                 "Total Memory",
-                Long.toString(getMemorySize().total/1048576) + " MB"
+                Long.toString(ms[0]/1048576) + " MB"
         ));
         mInfoObject.add(new InfoObject(
                 "Free Memory",
-                Long.toString(getMemorySize().free/1048576) + " MB"
+                Long.toString(ms[1]/1048576) + " MB"
+        ));
+        mInfoObject.add(new InfoObject(
+                "Number of Cores",
+                Integer.toString(mInfoUtil.getNumCores())
         ));
         mInfoObject.add(new InfoObject(
                 "Test",
                 "Test"
         ));
-        mInfoObject.add(new InfoObject(
-                "Test",
-                "Test"
-        ));
-
 
         initRecyclerView(view);
     }
@@ -208,5 +116,13 @@ public class CPUSpecs extends Fragment {
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
+    private InfoObject getInfoObject(String name) {
+        for(InfoObject io : this.mInfoObject)
+            if(io.getName().equals(name))
+                return io;
+
+        return null;
+    }
+
 
 }
