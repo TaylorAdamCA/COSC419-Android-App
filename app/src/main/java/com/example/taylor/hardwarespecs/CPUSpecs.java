@@ -53,7 +53,7 @@ public class CPUSpecs extends Fragment {
                         //ERROR:textView2 cannot be resolved
                         double[] ms = mInfoUtil.getMemorySize(view2);
                         setInfoObject("Free Memory", String.format("%.2f", ms[1] / 1048576) + " MB");
-                        setInfoObject("Available Memory", String.format("%.2f", (ms[0] / 1048576) - ms[1] / 1048576) + " MB");
+                        setInfoObject("In Use Memory", String.format("%.2f", (ms[0] / 1048576) - ms[1] / 1048576) + " MB");
                         for (int i = 1; i <= numCpus; i++)
                             setInfoObject("       Cpu" + i, Double.toString(mInfoUtil.getFrequency(i - 1) / 1000) + " MHz");
                     }
@@ -64,26 +64,31 @@ public class CPUSpecs extends Fragment {
 
 
     private void initInfoObjects(View view) {
-        double[] ms = mInfoUtil.getMemorySize(view);
+
         double[] clockSpeeds = mInfoUtil.getClockSpeeds(numCpus);
         mInfoObject = new ArrayList<>();
         mInfoObject.add(new InfoObject(
-
-                "Total Memory",
-                String.format("%.2f", ms[0] / 1048576) + " MB"
-
-        ));
-        mInfoObject.add(new InfoObject(
-                "Free Memory",
-                String.format("%.2f", ms[1] / 1048576) + " MB"
+                "Model",
+                mInfoUtil.getCpuModel().substring(mInfoUtil.getCpuModel().indexOf(':')+2)
         ));
 
-        mInfoObject.add(new InfoObject(
-                "Available Memory",
-                String.format("%.2f", (
-                        ms[0] - ms[1]
-                ))
-        ));
+//        mInfoObject.add(new InfoObject(
+//
+//                "Total Memory",
+//                String.format("%.2f", ms[0] / 1048576) + " MB"
+//
+//        ));
+//        mInfoObject.add(new InfoObject(
+//                "Free Memory",
+//                String.format("%.2f", ms[1] / 1048576) + " MB"
+//        ));
+//
+//        mInfoObject.add(new InfoObject(
+//                "Available Memory",
+//                String.format("%.2f", (
+//                        ms[0] - ms[1]
+//                ))
+//        ));
         mInfoObject.add(new InfoObject(
                 "Number of Cores",
                 Integer.toString(mInfoUtil.getNumCores())
@@ -123,8 +128,6 @@ public class CPUSpecs extends Fragment {
 
             }
         }
-
-
     }
 
 
