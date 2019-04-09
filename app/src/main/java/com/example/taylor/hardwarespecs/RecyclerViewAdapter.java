@@ -23,6 +23,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.mInfoObjects = mInfoObjects;
     }
 
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -35,7 +36,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Log.d(TAG, "onBindViewHolder: called");
 
-       /*Figure out how to get that info into the lists*/
+
         viewHolder.leftTv.setText(mInfoObjects.get(i).getName());
         viewHolder.rightTv.setText(mInfoObjects.get(i).getInfo());
 
